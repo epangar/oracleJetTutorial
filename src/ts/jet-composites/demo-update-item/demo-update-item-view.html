@@ -1,0 +1,87 @@
+<!--
+  Copyright (c) 2015, 2022, Oracle and/or its affiliates.
+  Licensed under The Universal Permissive License (UPL), Version 1.0
+  as shown at https://oss.oracle.com/licenses/upl/
+
+-->
+
+<!--
+  CREATE
+  Activity ID
+  Name
+  Price
+  Description
+  In-Stock
+  Quantity: Shipped
+
+
+  UPDATE
+  Item Id
+  Name
+  Price
+  Description
+
+-->
+<oj-form-layout id="form-container" label-edge="[[labelEdge]]" >
+
+  <oj-label-value>
+    <oj-label slot="label">Current mode</oj-label>
+    <div slot="value">
+      <oj-bind-text 
+        value="[[$properties.useCase]]"></oj-bind-text>
+    </div>
+  </oj-label-value>
+  
+  <oj-label-value>
+    <oj-label slot="label">Activity ID</oj-label>
+      <div slot="value">
+        <oj-bind-text 
+          value="[[$properties.activityId]]"></oj-bind-text>
+      </div>
+  </oj-label-value>
+
+  <oj-bind-if test="[[$properties.useCase = 'update']]">
+    <oj-label slot="label">Item ID</oj-label>
+    <div slot="value">
+      <oj-bind-text 
+        value="[[$properties.itemId]]"></oj-bind-text>
+    </div>
+  </oj-bind-if>
+
+  <oj-input-text 
+    value="{{$properties.itemName}}" 
+    label-hint="Item Name">
+  </oj-input-text>
+
+  <oj-input-text 
+    value="{{$properties.itemPrice}}" 
+    help.instruction="enter an amount with or wothout grouping separator"
+    converter="[[currency]]"
+    label-hint="Item Price">
+  </oj-input-text>
+
+  <oj-input-text 
+    value="{{$properties.itemDesc}}" 
+    validators="[[validators]]"
+    placeholder="Enter a description of 5-50 characters"
+    label-hint="Item Description">
+  </oj-input-text>
+
+
+
+    <!-- Create -->
+
+    <!-- In-Stock -->
+    <oj-bind-if test="[[$properties.useCase == 'create']]">
+      <oj-label class="oj-label" for="createNewInStock">Quantity: In-Stock</oj-label>
+      <oj-input-text value="{{$properties.quantityInstock}}"></oj-input-text>
+    </oj-bind-if>
+
+
+    <!-- Quantity: Shipped -->
+    <oj-bind-if test="[[$properties.useCase = 'create']]">
+      <oj-label class="oj-label" for="createNewShipped">Quantity: Shipped</oj-label>
+      <oj-input-text value="{{$properties.quantityShipped}}"></oj-input-text>
+    </oj-bind-if>
+
+</oj-form-layout>

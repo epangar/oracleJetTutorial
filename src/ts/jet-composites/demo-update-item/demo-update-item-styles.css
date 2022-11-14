@@ -1,0 +1,22 @@
+/* This file is where css selectors for the component go.
+   There will be hard coded properties and properties controlled by variables, for example
+
+   demo-update-item .demo-update-item-value-text {
+   color: var(--demo-update-item-value-text-color);
+   display: inline-block;
+	 }
+*/
+
+demo-update-item:not(.oj-complete){
+  visibility: hidden;
+}
+
+demo-update-item{
+	min-height: 50px;
+	width: 50px;
+}
+
+demo-update-item[hidden]
+{
+  display: none;
+}

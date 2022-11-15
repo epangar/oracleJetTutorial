@@ -9,11 +9,3 @@ Composite.register("demo-update-item", {
   viewModel: viewModel,
   metadata: JSON.parse(metadata)
 });
-
-declare global {
-  namespace preact.JSX {
-    interface IntrinsicElements {
-     "demo-update-item": any;
-    }
-  }
-}

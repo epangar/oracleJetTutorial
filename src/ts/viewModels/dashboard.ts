@@ -65,10 +65,10 @@ class DashboardViewModel {
 
 
   // Fields in update dialog
-  inputItemID: ko.Observable<number>;
-  inputItemName: ko.Observable<string>;
-  inputPrice: ko.Observable<number>;
-  inputShortDescription: ko.Observable<string>;
+  // inputItemID: ko.Observable<number>;
+  // inputItemName: ko.Observable<string>;
+  // inputPrice: ko.Observable<number>;
+  // inputShortDescription: ko.Observable<string>;
 
   //field for update
   useCase: ko.Observable<string>; //Create, update...
@@ -94,7 +94,7 @@ class DashboardViewModel {
   restServerURLItems = "https://apex.oracle.com/pls/apex/oraclejet/lp/activities/" + this.activityKey + "/items/";
 
   itemsArray: Array<Object>;
-  selectedData: ko.Observable<any>;
+  //selectedData: ko.Observable<any>;
   pieSeriesValue: ko.ObservableArray;
   // Observables for Activities
   selectedActivity = new ObservableKeySet();
@@ -136,13 +136,13 @@ class DashboardViewModel {
 
     // let itemsArray = activitiesArray[0].items;
 
-    this.selectedData = ko.observable('');
+    //this.selectedData = ko.observable('');
 
     this.pieSeriesValue = ko.observableArray([]);
 
     let pieSeries = [
-      {name: "Quantity in Stock", items: [this.selectedData().quantity_instock]},
-      {name: "Quantity Shipped", items: [this.selectedData().quantity_shipped]}
+      {name: "Quantity in Stock", items: [this.firstSelectedItem()?.data.quantity_instock]},
+      {name: "Quantity Shipped", items: [this.firstSelectedItem()?.data.quantity_shipped]}
     ];
     this.pieSeriesValue(pieSeries);
     
@@ -153,10 +153,10 @@ class DashboardViewModel {
     this.quantity_shipped = ko.observable<number>();
     this.quantity = 0;
 
-    this.inputItemID = ko.observable();
-    this.inputItemName = ko.observable();
-    this.inputPrice = ko.observable();
-    this.inputShortDescription = ko.observable();
+    // this.inputItemID = ko.observable();
+    // this.inputItemName = ko.observable();
+    // this.inputPrice = ko.observable();
+    // this.inputShortDescription = ko.observable();
     
     //
     this.useCase = ko.observable('');
@@ -166,10 +166,6 @@ class DashboardViewModel {
 
     
 
-    // this.currentItemSubscription= this.currentItem.subscribe((data)=>{
-    //   debugger
-    // })
-    
 
   }
 
@@ -222,7 +218,7 @@ class DashboardViewModel {
       this.activitySelected(true);
       this.itemSelected(false);
       this.selectedKeyItem();
-      this.selectedData();
+      //this.selectedData();
     } else {
       // debugger
       // If deselection, hide list      
@@ -236,7 +232,7 @@ class DashboardViewModel {
     this.useCase('create');
 
     //Inicializar observable de currentItem
-    this.currentItem({...emptyItem});
+    this.currentItem({...emptyItem, activity_id : this.firstSelectedActivity().data.id});
 
     let x = document.getElementById("createDialog");
     let y = (x as ojDialog);
@@ -244,27 +240,38 @@ class DashboardViewModel {
   }
 
   public createItem = async(event: ojButtonEventMap["ojAction"]) => {
-    let a = Number(this.quantity_instock());
-    let b = Number(this.quantity_shipped());
-    this.quantity = a + b;
+    debugger
+  //AQUÍ debo actualizar el observable this.currentItem()
+    console.log(event)
+
+
+    //this.currentItem(this.selectedData())
+    let a = Number(this.currentItem().quantity_instock);
+    let b = Number(this.currentItem().quantity_shipped);
     
+   
+
+    //TODO
+    // const row = {
+    //   name: this.itemName(),
+    //   short_desc: this.short_desc(),
+    //   price: this.price(),
+    //   quantity_instock: this.quantity_instock(),
+    //   quantity_shipped: this.quantity_shipped(),
+    //   quantity: a+b,
+    //   activity_id: this.activityKey,
+    //   image: this.inputImageFile,
+    //   };
+
+
     
-    const row = {
-      name : this.itemName(),
-      short_desc: this.short_desc(),
-      price : this.price(),
-      quantity_instock: this.quantity_instock(),
-      quantity_shipped: this.quantity_shipped(),
-      quantity: this.quantity,
-      activity_id: this.activityKey,
-      image: this.inputImageFile
-    };
-    
+    //Sustituir row por currentItem()
+
     const request = new Request(this.restServerURLItems, {
       headers: new Headers({
         "Content-type": "application/json; charset=UTF-8",
       }),
-      body: JSON.stringify(row),
+      body: JSON.stringify(this.currentItem()),
       method: "POST"
     })
 
@@ -293,12 +300,14 @@ class DashboardViewModel {
   }
 
   public showEditDialog = (event: ojButtonEventMap["ojAction"]) => {
-      this.inputItemName(this.selectedData().name);
-      this.inputPrice(this.selectedData().price);
-      this.inputShortDescription(this.selectedData().short_desc);
       
       //Observable de useCase
       this.useCase('update');
+
+      //Observable of currentItem
+      debugger
+      const item : Item = this.firstSelectedItem().data;
+      this.currentItem({...item});
 
       /*
       type Item = {
@@ -313,13 +322,6 @@ class DashboardViewModel {
         image: string;
       }*/
       
-      //Observable of currentItem
-
-     
-
-      debugger
-
-      //this.currentItem.id(1)
       
 
       // this.currentItem({
@@ -333,6 +335,7 @@ class DashboardViewModel {
       //   activity_id: this.selectedData().activity_id,
       //   image: this.selectedData().image,
       // })
+
       
 
 
@@ -348,22 +351,16 @@ class DashboardViewModel {
 
     if(currentRow != null){
       debugger
-      this.activityKey
-      const row = {
-        itemId: this.selectedData().id,
-        name: this.inputItemName(),
-        price: this.inputPrice(),
-        short_desc: this.inputShortDescription()
-      };
+      
       
 
       const request = new Request(
-        `${this.restServerURLItems}${this.selectedData().id}`,
+        `${this.restServerURLItems}${this.currentItem().id}`,
         {
           headers: new Headers({
             "Content-type": "application/json; charset=UTF-8",
           }),
-          body: JSON.stringify(row),
+          body: JSON.stringify(this.currentItem()),
           method: "PUT",
         }
       );
@@ -372,7 +369,7 @@ class DashboardViewModel {
       const updatedRow = await response.json()
 
 
-      const updatedRowKey = this.selectedData().id;
+      const updatedRowKey = this.currentItem().id;
       const updatedRowMetaData = { key: updatedRowKey}
       this.itemsDataProvider.mutate({
         update: {
@@ -385,7 +382,6 @@ class DashboardViewModel {
       this.itemsDataProvider.refresh()
     };
 
-
     (document.getElementById("editDialog") as  ojDialog).close()
   }
   
@@ -393,7 +389,7 @@ class DashboardViewModel {
 
   public deleteItem = async (event: ojButtonEventMap["ojAction"]) => {
 
-    let itemID = this.firstSelectedItem().data.id;
+    let itemID = this.firstSelectedItem()?.data.id;
    
     const currentRow = this.selectedRow;
     if (currentRow != null) {
@@ -436,15 +432,16 @@ class DashboardViewModel {
     let isClicked = event.detail.value.data;
 
     if (isClicked != null) {
-      // debugger
+      debugger
       // If selection, populate and display list
-      this.selectedData(event.detail.value.data); //cambiar a selectedData, y selectedKeyItem cambiar a selectedKeyItem
-      this.currentItem(this.selectedData())
+      //this.firstSelectedItem(event.detail.value.data); //cambiar itemData  a selectedData, y selectedItem cambiar a selectedKeyItem
+      debugger
+      this.currentItem(isClicked); // cambia selectedData por firstSelectedItem.data y quitar selectedData
 
       // Create variable and get attributes of the items list to set pie chart values
       let pieSeries = [
-      { name: "Quantity in Stock", items: [this.selectedData().quantity_instock] },
-      { name: "Quantity Shipped", items: [this.selectedData().quantity_shipped] }
+      { name: "Quantity in Stock", items: [isClicked.quantity_instock] },
+      { name: "Quantity Shipped", items: [isClicked.quantity_shipped] }
       ];
       // Update the pie chart with the data
       this.pieSeriesValue(pieSeries);

@@ -3,43 +3,17 @@
   "version": "1.0.0",
   "jetVersion": "^13.1.0",
   "displayName": "demo-update-item",
+  "type": "composite",
   "description": "A Web Component with form layout.",
   "properties": {
-   "itemId": {
-      "type": "number"
-   },
-   "activityId": {
-      "type": "number",
-      "description": "Id of Activity",
-      "writeback": true
-   },
-   "itemName": {
-      "type": "string",
-      "description": "Description for the item-name attribute",
-      "writeback": true
-   },
-   "itemPrice": {
-      "type": "number",
-      "writeback": true
-   },
-   "itemDesc": {
-      "type": "string",
-      "writeback": true
-   },
+  
    "useCase": {
       "type": "string",
       "writeback": true
    },
-   "quantityInstock": {
-      "type": "number",
-      "writeback": true
-   },
-   "quantityShipped": {
-      "type": "number",
-      "writeback": true
-   },
    "item":{
-      "type": "Item"
+      "type": "Item",
+      "writeback": true
    }
 
 },

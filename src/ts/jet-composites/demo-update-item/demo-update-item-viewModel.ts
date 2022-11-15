@@ -13,11 +13,30 @@ import "ojs/ojlabelvalue";
 import { IntlNumberConverter } from "ojs/ojconverter-number";
 import AsyncLengthValidator = require("ojs/ojasyncvalidator-length");
 
-export default class ViewModel implements Composite.ViewModel<Composite.PropertiesType> {
+
+type Item = {
+    id: number;
+    name: string;
+    short_desc: string;
+    price: number;
+    quantity: number;
+    quantity_shipped: number;
+    quantity_instock: number;
+    activity_id: number;
+    image: string;
+  }
+
+  interface MyProperties {
+    useCase: string;
+    item: Item;
+  }
+  
+
+export default class ViewModel implements Composite.ViewModel<MyProperties> {
     busyResolve: (() => void);
     composite: Element;
     messageText: ko.Observable<string>;
-    properties: Composite.PropertiesType;
+    properties: MyProperties;
     res: { [key: string]: string };
     smallQuery = ResponsiveUtils.getFrameworkQuery( ResponsiveUtils.FRAMEWORK_QUERY_KEY.SM_ONLY);
     isSmall: ko.Observable = ResponsiveKnockoutUtils.createMediaQueryObservable(this.smallQuery);
@@ -28,8 +47,9 @@ export default class ViewModel implements Composite.ViewModel<Composite.Properti
     lengthValue1: ko.Observable<string>;
     validators: ko.ObservableArray<AsyncLengthValidator<string>>;
     isUpdate : boolean;
+    myObservable : ko.Observable<Item>;
 
-    constructor(context: Composite.ViewModelContext<Composite.PropertiesType>) {        
+    constructor(context: Composite.ViewModelContext<MyProperties>) {        
         //At the start of your viewModel constructor
         const elementContext: Context = Context.getContext(context.element);
         const busyContext: Context.BusyContext = elementContext.getBusyContext();
@@ -41,6 +61,7 @@ export default class ViewModel implements Composite.ViewModel<Composite.Properti
         //Example observable
         this.messageText = ko.observable("Hello from demo-update-item");
         this.properties = context.properties;
+        this.myObservable = ko.observable<Item>(this.properties.item);
         this.res = componentStrings["demo-update-item"];
 
         this.currency = new IntlNumberConverter({
@@ -63,25 +84,39 @@ export default class ViewModel implements Composite.ViewModel<Composite.Properti
         this.busyResolve(); 
     }
 
+    
+
     //Lifecycle methods - implement if necessary 
 
-    activated(context: Composite.ViewModelContext<Composite.PropertiesType>): Promise<any> | void {
-        
+    activated(context: Composite.ViewModelContext<MyProperties>): Promise<any> | void {
+        debugger
     };
 
-    connected(context: Composite.ViewModelContext<Composite.PropertiesType>): void {
-    
+    connected(context: Composite.ViewModelContext<MyProperties>): void {
+        debugger
     };
 
-    bindingsApplied(context: Composite.ViewModelContext<Composite.PropertiesType>): void {
-        
+    bindingsApplied(context: Composite.ViewModelContext<MyProperties>): void {
+        debugger
     };
 
-    propertyChanged(context: Composite.PropertyChangedContext<Composite.PropertiesType>): void {
-    
+    propertyChanged(context: Composite.PropertyChangedContext<MyProperties>): void {
+        //Cuando cambia una propiedad. context.property = qué cambia, context.value = a qué
+        debugger
+        if(context.property === "item"){
+            debugger
+            //console.log(this.properties)
+            this.myObservable(context.value as Item);
+            
+            console.log(this.myObservable())
+        } else if(context.property === "useCase"){
+            debugger
+
+            
+        }
     };
 
     disconnected(element: Element): void {
-    
+        debugger
     };
 };

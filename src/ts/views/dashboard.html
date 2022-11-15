@@ -101,7 +101,7 @@
             
 
             <!--Mi componente custom-->
-            <demo-update-item
+            <!-- <demo-update-item
               item-name="{{inputItemName}}"
               item-price="{{inputPrice}}"
               item-desc="{{inputShortDescription}}"
@@ -109,23 +109,15 @@
               quantity-instock="{{quantity_instock}}"
               quantity-shipped="{{quantity_shipped}}"
               activity-id="{{activityKey}}">
-            </demo-update-item>
+            </demo-update-item> -->
+            <demo-update-item
+                id="create"
+                item="{{currentItem()}}"
+                use-case="{{useCase}}">
+              </demo-update-item>
             <!--Que el componente custom que cree se use para create 
         Recomendación: tipo texto-->
         
-
-            <!-- <oj-label class="oj-label oj-label-value" for="createActivityId">Activity ID</oj-label>
-            <oj-input-text id="createActivityId" readonly value="[[activityKey]]"></oj-input-text>
-            <oj-label class="oj-label" for="createNewName">Name</oj-label>
-            <oj-input-text id="createNewName" value="{{itemName}}"></oj-input-text>
-            <oj-label class="oj-label" for="createNewPrice">Price</oj-label>
-            <oj-input-text id="createNewPrice" value="{{price}}"></oj-input-text>
-            <oj-label class="oj-label" for="createNewDesc">Description</oj-label>
-            <oj-input-text id="createNewDesc" value="{{short_desc}}"></oj-input-text>
-            <oj-label class="oj-label" for="createNewInStock">Quantity: In-Stock</oj-label>
-            <oj-input-text id="createNewInStock" value="{{quantity_instock}}"></oj-input-text>
-            <oj-label class="oj-label" for="createNewShipped">Quantity: Shipped</oj-label>
-            <oj-input-text id="createNewShipped" value="{{quantity_shipped}}"></oj-input-text> -->
          </div>
           <div slot="footer">
             <oj-button id="submitBtn" on-oj-action="[[createItem]]">Submit</oj-button>
@@ -139,14 +131,9 @@
             cancel-behavior="icon">
             <div slot="body">
               <demo-update-item
+                id="update"
                 item="{{currentItem()}}"
-                item-id="[[selectedData().id]]"
-                item-name="{{inputItemName}}"
-                item-price="{{inputPrice}}"
-                item-desc="{{inputShortDescription}}"
-                use-case="{{useCase}}"
-                activity-Id="{{activityKey}}"
-                >
+                use-case="{{useCase}}">
               </demo-update-item>
               
               
@@ -162,21 +149,21 @@
             <h3>Item Details</h3>
 
             <hr class="hr-margin" />
-            <oj-avatar role="img" size="lg" :aria-label="[['product image for '+ selectedData().name]]"
-              :src="[[selectedData().image]]" class="float-right">
+            <oj-avatar role="img" size="lg" :aria-label="[['product image for '+ firstSelectedItem()?.data.name]]"
+              :src="[[firstSelectedItem()?.data.image]]" class="float-right">
             </oj-avatar>
 
             <div id="itemName" class="data-name">
-              <obj-bind-text value="[[selectedData().name]]"></obj-bind-text>
+              <obj-bind-text value="[[firstSelectedItem()?.data.name]]"></obj-bind-text>
             </div>
             <div id="itemDesc" class="data-desc">
-              <obj-bind-text value="[[selectedData().short_desc]]"></obj-bind-text>
+              <obj-bind-text value="[[firstSelectedItem()?.data.short_desc]]"></obj-bind-text>
             </div>
             <div id="itemPrice">
-              <obj-bind-text value="[['Price: ' + selectedData().price + ' each']]"></obj-bind-text>
+              <obj-bind-text value="[['Price: ' + firstSelectedItem()?.data.price + ' each']]"></obj-bind-text>
             </div>
             <div id="itemId">
-              <obj-bind-text value="[['Item Id: ' + selectedData().id]]"></obj-bind-text>
+              <obj-bind-text value="[['Item Id: ' + firstSelectedItem()?.data.id]]"></obj-bind-text>
             </div>
 
             <div>

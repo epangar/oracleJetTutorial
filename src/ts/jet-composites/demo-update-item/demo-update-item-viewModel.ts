@@ -28,7 +28,7 @@ type Item = {
 
   interface MyProperties {
     useCase: string;
-    item: Item;
+    item: ko.Observable<Item>;
   }
   
 
@@ -61,7 +61,9 @@ export default class ViewModel implements Composite.ViewModel<MyProperties> {
         //Example observable
         this.messageText = ko.observable("Hello from demo-update-item");
         this.properties = context.properties;
-        this.myObservable = ko.observable<Item>(this.properties.item);
+        //const item = {...};
+        debugger
+        this.myObservable = this.properties.item;
         this.res = componentStrings["demo-update-item"];
 
         this.currency = new IntlNumberConverter({
@@ -89,24 +91,24 @@ export default class ViewModel implements Composite.ViewModel<MyProperties> {
     //Lifecycle methods - implement if necessary 
 
     activated(context: Composite.ViewModelContext<MyProperties>): Promise<any> | void {
-        debugger
+        
     };
 
     connected(context: Composite.ViewModelContext<MyProperties>): void {
-        debugger
+        
     };
 
     bindingsApplied(context: Composite.ViewModelContext<MyProperties>): void {
-        debugger
+        
     };
 
-    propertyChanged(context: Composite.PropertyChangedContext<MyProperties>): void {
+    propertyChanged = (context: Composite.PropertyChangedContext<MyProperties>): void => {
         //Cuando cambia una propiedad. context.property = qué cambia, context.value = a qué
         debugger
         if(context.property === "item"){
             debugger
             //console.log(this.properties)
-            this.myObservable(context.value as Item);
+            this.myObservable((context.value as ko.Observable<Item>)() as Item);
             
             console.log(this.myObservable())
         } else if(context.property === "useCase"){
@@ -117,6 +119,6 @@ export default class ViewModel implements Composite.ViewModel<MyProperties> {
     };
 
     disconnected(element: Element): void {
-        debugger
+        
     };
 };

@@ -33,14 +33,14 @@
   </oj-label-value>
 
   <oj-bind-if test="[[myObservable]]"> 
-    <oj-label-value>
+    <!-- <oj-label-value>
       <oj-label slot="label">Observable</oj-label>
         <div slot="value">
           <oj-bind-text
             value="[[JSON.stringify($properties.item)]]"></oj-bind-text>
         </div>
-    </oj-label-value>
-    <oj-label-value>
+    </oj-label-value> -->
+    <!-- <oj-label-value>
       <oj-label slot="label">myObservable</oj-label>
         <div slot="value">
           <oj-bind-text
@@ -52,38 +52,52 @@
           >
           </oj-bind-text>
     </oj-label-value>
-  </oj-bind-if>
+  </oj-bind-if> -->
   
   <oj-label-value>
     <oj-label slot="label">Activity ID</oj-label>
       <div slot="value">
         <oj-bind-text 
-          value="[[myObservable().activity_id]]"></oj-bind-text>
+          value="[[myObservable()?.activity_id]]"></oj-bind-text>
       </div>
   </oj-label-value>
 
-  <oj-bind-if test="[[$properties.useCase = 'update']]">
+  <oj-bind-if test="[[$properties.useCase === 'update']]">
     <oj-label slot="label">Item ID</oj-label>
     <div slot="value">
       <oj-bind-text 
-        value="[[myObservable().id]]"></oj-bind-text>
+        value="[[myObservable()?.id]]"></oj-bind-text>
     </div>
   </oj-bind-if>
 
+  <span>
+    <oj-bind-text 
+    value="[[myObservable()?.name]]"></oj-bind-text>
+  </span>
+  <oj-label-value>
+    <oj-label slot="label">Item name</oj-label>
+      <div slot="value">
+        <span>
+          <oj-bind-text 
+          value="[[myObservable()?.name]]"></oj-bind-text>
+        </span>
+      </div>
+  </oj-label-value>
+
   <oj-input-text 
-    value="{{myObservable().name}}" 
+    value="{{myObservable()?.name}}" 
     label-hint="Item Name">
   </oj-input-text>
 
   <oj-input-text 
-    value="{{myObservable().price}}" 
+    value="{{myObservable()?.price}}" 
     help.instruction="enter an amount with or wothout grouping separator"
     converter="[[currency]]"
     label-hint="Item Price">
   </oj-input-text>
 
   <oj-input-text 
-    value="{{myObservable().short_desc}}" 
+    value="{{myObservable()?.short_desc}}" 
     validators="[[validators]]"
     placeholder="Enter a description of 5-50 characters"
     label-hint="Item Description">
@@ -96,14 +110,14 @@
     <!-- In-Stock -->
     <oj-bind-if test="[[$properties.useCase === 'create']]">
       <oj-label class="oj-label" for="createNewInStock">Quantity: In-Stock</oj-label>
-      <oj-input-text value="{{myObservable().quantityInstock}}"></oj-input-text>
+      <oj-input-text value="{{myObservable()?.quantityInstock}}"></oj-input-text>
     </oj-bind-if>
 
 
     <!-- Quantity: Shipped -->
     <oj-bind-if test="[[$properties.useCase === 'create']]">
       <oj-label class="oj-label" for="createNewShipped">Quantity: Shipped</oj-label>
-      <oj-input-text value="{{myObservable().quantityShipped}}"></oj-input-text>
+      <oj-input-text value="{{myObservable()?.quantityShipped}}"></oj-input-text>
     </oj-bind-if>
-
+  </oj-bind-if>
 </oj-form-layout>

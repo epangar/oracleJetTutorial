@@ -38,6 +38,13 @@ type Item = {
   image: string;
 }
 
+type ItemToUpdate = {
+  itemId: number;
+  name: string;
+  short_desc: string;
+  price: number;
+}
+
 type ActivityItems = {
   id: number;
   name: string;
@@ -309,36 +316,6 @@ class DashboardViewModel {
       const item : Item = this.firstSelectedItem().data;
       this.currentItem({...item});
 
-      /*
-      type Item = {
-        id: number;
-        name: string;
-        short_desc: string;
-        price: number;
-        quantity: number;
-        quantity_shipped: number;
-        quantity_instock: number;
-        activity_id: number;
-        image: string;
-      }*/
-      
-      
-
-      // this.currentItem({
-      //   id: this.selectedData().id,
-      //   name: this.selectedData().name,
-      //   short_desc: this.selectedData().short_desc,
-      //   price: this.selectedData().price,
-      //   quantity: this.selectedData().quantity,
-      //   quantity_shipped: this.selectedData().quantity_shipped,
-      //   quantity_instock: this.selectedData().quantity_instock,
-      //   activity_id: this.selectedData().activity_id,
-      //   image: this.selectedData().image,
-      // })
-
-      
-
-
     (document.getElementById("editDialog") as ojDialog).open();
   }
 
@@ -351,16 +328,20 @@ class DashboardViewModel {
     debugger
     if(currentRow != null){
       
+      const itemToUpdate : ItemToUpdate = {
+        itemId: this.currentItem().id,
+        name: this.currentItem().name,
+        price: this.currentItem().price,
+        short_desc: this.currentItem().short_desc
+      }
       
-      
-
       const request = new Request(
         `${this.restServerURLItems}${this.currentItem().id}`,
         {
           headers: new Headers({
             "Content-type": "application/json; charset=UTF-8",
           }),
-          body: JSON.stringify(this.currentItem()),
+          body: JSON.stringify(itemToUpdate),
           method: "PUT",
         }
       );

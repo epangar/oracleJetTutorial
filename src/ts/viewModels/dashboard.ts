@@ -348,9 +348,9 @@ class DashboardViewModel {
   public updateItemSubmit = async (event: ojButtonEventMap["ojAction"]) => {
     
     const currentRow = this.selectedRow;
-
+    debugger
     if(currentRow != null){
-      debugger
+      
       
       
 
@@ -436,7 +436,7 @@ class DashboardViewModel {
       // If selection, populate and display list
       //this.firstSelectedItem(event.detail.value.data); //cambiar itemData  a selectedData, y selectedItem cambiar a selectedKeyItem
       debugger
-      this.currentItem(isClicked); // cambia selectedData por firstSelectedItem.data y quitar selectedData
+      //this.currentItem(isClicked); // cambia selectedData por firstSelectedItem.data y quitar selectedData
 
       // Create variable and get attributes of the items list to set pie chart values
       let pieSeries = [

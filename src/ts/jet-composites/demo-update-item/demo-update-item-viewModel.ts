@@ -28,7 +28,7 @@ type Item = {
 
   interface MyProperties {
     useCase: string;
-    item: ko.Observable<Item>;
+    item: Item;
   }
   
 
@@ -48,6 +48,7 @@ export default class ViewModel implements Composite.ViewModel<MyProperties> {
     validators: ko.ObservableArray<AsyncLengthValidator<string>>;
     isUpdate : boolean;
     myObservable : ko.Observable<Item>;
+    id: ko.Observable<string>;
 
     constructor(context: Composite.ViewModelContext<MyProperties>) {        
         //At the start of your viewModel constructor
@@ -58,12 +59,14 @@ export default class ViewModel implements Composite.ViewModel<MyProperties> {
 
         this.composite = context.element;
 
+        //obtener context.uniqueId
+
         //Example observable
         this.messageText = ko.observable("Hello from demo-update-item");
         this.properties = context.properties;
         //const item = {...};
         debugger
-        this.myObservable = this.properties.item;
+        this.myObservable = ko.observable<Item>(this.properties.item);
         this.res = componentStrings["demo-update-item"];
 
         this.currency = new IntlNumberConverter({
@@ -77,11 +80,7 @@ export default class ViewModel implements Composite.ViewModel<MyProperties> {
             new AsyncLengthValidator({min:5, max: 50}),
         ])
 
-        // Example for parsing context properties
-        // if (context.properties.name) {
-        //     parse the context properties here
-        // }
-
+        this.id = ko.observable(context.uniqueId);
         //Once all startup and async activities have finished, relocate if there are any async activities
         this.busyResolve(); 
     }
@@ -104,19 +103,17 @@ export default class ViewModel implements Composite.ViewModel<MyProperties> {
 
     propertyChanged = (context: Composite.PropertyChangedContext<MyProperties>): void => {
         //Cuando cambia una propiedad. context.property = qué cambia, context.value = a qué
-        debugger
-        if(context.property === "item"){
-            debugger
-            //console.log(this.properties)
-            this.myObservable((context.value as ko.Observable<Item>)() as Item);
-            
-            console.log(this.myObservable())
-        } else if(context.property === "useCase"){
-            debugger
-
-            
+    
+        if (context.property === "item") {
+          debugger;
+          //console.log(this.properties)
+          this.myObservable(context.value as Item);
+    
+          //console.log(this.myObservable());
+        } else if (context.property === "useCase") {
+          
         }
-    };
+      };
 
     disconnected(element: Element): void {
         

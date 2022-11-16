@@ -12,7 +12,7 @@
       "writeback": true
    },
    "item":{
-      "type": "ko.Observable<Item>",
+      "type": "Item",
       "writeback": true
    }
 

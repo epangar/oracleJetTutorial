@@ -135,7 +135,7 @@ class CustomersViewModel {
     this.currentItem = ko.observable({...emptyItem});
 
 
-
+  
   }
 
   selectedActivityChanged = (event: ojListView.firstSelectedItemChanged<ActivityItems["id"], ActivityItems>) => {
@@ -256,9 +256,6 @@ class CustomersViewModel {
     (document.getElementById("editDialog") as ojDialog).open();
   }
 
-
-
-
   public updateItemSubmit = async (event: ojButtonEventMap["ojAction"]) => {
     
     const currentRow = this.selectedRow;
@@ -303,8 +300,6 @@ class CustomersViewModel {
     (document.getElementById("editDialog") as  ojDialog).close()
   }
   
-  
-
   public deleteItem = async (event: ojButtonEventMap["ojAction"]) => {
 
     let itemID = this.firstSelectedItem()?.data.id;

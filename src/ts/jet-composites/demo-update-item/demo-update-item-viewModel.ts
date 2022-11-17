@@ -105,11 +105,8 @@ export default class ViewModel implements Composite.ViewModel<MyProperties> {
         //Cuando cambia una propiedad. context.property = qué cambia, context.value = a qué
     
         if (context.property === "item") {
-          debugger;
-          //console.log(this.properties)
+          debugger;          
           this.myObservable(context.value as Item);
-    
-          //console.log(this.myObservable());
         } else if (context.property === "useCase") {
           
         }

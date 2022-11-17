@@ -33,26 +33,7 @@
   </oj-label-value>
 
   <oj-bind-if test="[[myObservable()]]"> 
-    <!-- <oj-label-value>
-      <oj-label slot="label">Observable</oj-label>
-        <div slot="value">
-          <oj-bind-text
-            value="[[JSON.stringify($properties.item)]]"></oj-bind-text>
-        </div>
-    </oj-label-value> -->
-    <!-- <oj-label-value>
-      <oj-label slot="label">myObservable</oj-label>
-        <div slot="value">
-          <oj-bind-text
-            value="{{JSON.stringify(myObservable())}}"></oj-bind-text>
-          
-        </div>
-        <oj-bind-text 
-            value="[[myObservable().name]]" 
-          >
-          </oj-bind-text>
-    </oj-label-value>
-  </oj-bind-if> -->
+    
   
   <oj-label-value>
     <oj-label slot="label">Activity ID</oj-label>
@@ -74,7 +55,7 @@
     <oj-bind-text 
     value="[[myObservable().name]]"></oj-bind-text>
   </span>
-  <oj-label-value>
+  <!-- <oj-label-value>
     <oj-label slot="label">Item name</oj-label>
       <div slot="value">
         <span>
@@ -82,7 +63,7 @@
           value="[[myObservable().name]]"></oj-bind-text>
         </span>
       </div>
-  </oj-label-value>
+  </oj-label-value> -->
 
   <oj-input-text 
     :id="[[id().concat('name')]]"

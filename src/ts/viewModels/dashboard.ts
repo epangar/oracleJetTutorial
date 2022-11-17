@@ -70,13 +70,6 @@ class DashboardViewModel {
   //Usar ese objeto en Update y create
   currentItem: ko.Observable<Item>;
 
-
-  // Fields in update dialog
-  // inputItemID: ko.Observable<number>;
-  // inputItemName: ko.Observable<string>;
-  // inputPrice: ko.Observable<number>;
-  // inputShortDescription: ko.Observable<string>;
-
   //field for update
   useCase: ko.Observable<string>; //Create, update...
 
@@ -101,14 +94,11 @@ class DashboardViewModel {
   restServerURLItems = "https://apex.oracle.com/pls/apex/oraclejet/lp/activities/" + this.activityKey + "/items/";
 
   itemsArray: Array<Object>;
-  //selectedData: ko.Observable<any>;
   pieSeriesValue: ko.ObservableArray;
-  // Observables for Activities
   selectedActivity = new ObservableKeySet();
   activitySelected = ko.observable(false);
   firstSelectedActivity = ko.observable();
   selectedActivityIds = ko.observable();
-  // Observables for Activity Items
   itemSelected = ko.observable(false);
   selectedKeyItem = ko.observable();
   firstSelectedItem = ko.observable();
@@ -137,14 +127,7 @@ class DashboardViewModel {
       }
     })
 
-    // this.activityDataProvider
-
-    // let activitiesArray = JSON.parse(storeData);
-
-    // let itemsArray = activitiesArray[0].items;
-
-    //this.selectedData = ko.observable('');
-
+   
     this.pieSeriesValue = ko.observableArray([]);
 
     let pieSeries = [
@@ -159,12 +142,6 @@ class DashboardViewModel {
     this.quantity_instock = ko.observable<number>();
     this.quantity_shipped = ko.observable<number>();
     this.quantity = 0;
-
-    // this.inputItemID = ko.observable();
-    // this.inputItemName = ko.observable();
-    // this.inputPrice = ko.observable();
-    // this.inputShortDescription = ko.observable();
-    
     //
     this.useCase = ko.observable('');
 
@@ -185,15 +162,8 @@ class DashboardViewModel {
     let itemContext = event.detail.value.data;
  
     if (itemContext != null) {    
-      // debugger
-       // If selection, populate and display list
-       // Hide currently-selected activity item
+      
       this.activitySelected(false);
-
-      //let itemsArray = itemContext.items;
-      //this.itemsDataProvider.data = itemsArray;
-      // Set List View properties
-
       this.activityKey = event.detail.value.data.id;
       this.restServerURLItems =  "https://apex.oracle.com/pls/apex/oraclejet/lp/activities/" + this.activityKey + "/items/";
 
@@ -248,31 +218,13 @@ class DashboardViewModel {
 
   public createItem = async(event: ojButtonEventMap["ojAction"]) => {
     debugger
-  //AQUÍ debo actualizar el observable this.currentItem()
+    //AQUÍ debo actualizar el observable this.currentItem()
     console.log(event)
 
 
     //this.currentItem(this.selectedData())
     let a = Number(this.currentItem().quantity_instock);
     let b = Number(this.currentItem().quantity_shipped);
-    
-   
-
-    //TODO
-    // const row = {
-    //   name: this.itemName(),
-    //   short_desc: this.short_desc(),
-    //   price: this.price(),
-    //   quantity_instock: this.quantity_instock(),
-    //   quantity_shipped: this.quantity_shipped(),
-    //   quantity: a+b,
-    //   activity_id: this.activityKey,
-    //   image: this.inputImageFile,
-    //   };
-
-
-    
-    //Sustituir row por currentItem()
 
     const request = new Request(this.restServerURLItems, {
       headers: new Headers({
@@ -409,16 +361,12 @@ class DashboardViewModel {
   * Handle selection from Activity Items list
   */
   selectedItemChanged = (event: ojListView.firstSelectedItemChanged<Item["id"], Item>) => {
-    // debugger
     let isClicked = event.detail.value.data;
 
     if (isClicked != null) {
       debugger
       // If selection, populate and display list
-      //this.firstSelectedItem(event.detail.value.data); //cambiar itemData  a selectedData, y selectedItem cambiar a selectedKeyItem
-      debugger
-      //this.currentItem(isClicked); // cambia selectedData por firstSelectedItem.data y quitar selectedData
-
+      
       // Create variable and get attributes of the items list to set pie chart values
       let pieSeries = [
       { name: "Quantity in Stock", items: [isClicked.quantity_instock] },
@@ -432,9 +380,8 @@ class DashboardViewModel {
     }
     else {
     // If deselection, hide list
-      // debugger
     
-    this.itemSelected(false);    
+      this.itemSelected(false);    
     }
   };
 

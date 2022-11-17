@@ -15,12 +15,6 @@ import { ojButtonEventMap } from 'ojs/ojbutton';
 import "demo-update-item/loader";
 
 
-// type ChartType = {
-//   value: string;
-//   label:string;
-// }
-
-//En vez de crear un observable con cada propiedad, tener un observable de  Item
 
 type Activity = {
   id: number
@@ -76,12 +70,7 @@ class DashboardViewModel {
   //  Fields for delete button and update dialog, among others
   selectedRow = ko.observable<number>();
 
-  // Fields in Create dialog
-  itemName: ko.Observable<string>;
-  price: ko.Observable<number>;
-  short_desc: ko.Observable<string>;
-  quantity_instock: ko.Observable<number>;
-  quantity_shipped: ko.Observable<number>;
+
   quantity: number;
   inputImageFile: string = 'css/images/product_images/jet_logo_256.png'
 
@@ -102,6 +91,8 @@ class DashboardViewModel {
   itemSelected = ko.observable(false);
   selectedKeyItem = ko.observable();
   firstSelectedItem = ko.observable();
+
+
   
   constructor() {
     
@@ -135,12 +126,7 @@ class DashboardViewModel {
       {name: "Quantity Shipped", items: [this.firstSelectedItem()?.data.quantity_shipped]}
     ];
     this.pieSeriesValue(pieSeries);
-    
-    this.itemName = ko.observable<string>();
-    this.price = ko.observable<number>();
-    this.short_desc = ko.observable<string>();
-    this.quantity_instock = ko.observable<number>();
-    this.quantity_shipped = ko.observable<number>();
+
     this.quantity = 0;
     //
     this.useCase = ko.observable('');
@@ -148,7 +134,6 @@ class DashboardViewModel {
     //
     this.currentItem = ko.observable({...emptyItem});
 
-    
 
 
   }
@@ -384,6 +369,8 @@ class DashboardViewModel {
       this.itemSelected(false);    
     }
   };
+
+ 
 
   
 

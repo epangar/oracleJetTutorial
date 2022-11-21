@@ -202,7 +202,7 @@ class DashboardViewModel {
   }
 
   public createItem = async(event: ojButtonEventMap["ojAction"]) => {
-    debugger
+    //debugger
     //AQUÍ debo actualizar el observable this.currentItem()
     console.log(event)
 
@@ -249,7 +249,7 @@ class DashboardViewModel {
       this.useCase('update');
 
       //Observable of currentItem
-      debugger
+      //debugger
       const item : Item = this.firstSelectedItem().data;
       this.currentItem({...item});
 
@@ -262,7 +262,7 @@ class DashboardViewModel {
   public updateItemSubmit = async (event: ojButtonEventMap["ojAction"]) => {
     
     const currentRow = this.selectedRow;
-    debugger
+    //debugger
     if(currentRow != null){
       
       const itemToUpdate : ItemToUpdate = {
@@ -349,7 +349,7 @@ class DashboardViewModel {
     let isClicked = event.detail.value.data;
 
     if (isClicked != null) {
-      debugger
+      //debugger
       // If selection, populate and display list
       
       // Create variable and get attributes of the items list to set pie chart values

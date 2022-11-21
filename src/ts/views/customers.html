@@ -17,7 +17,7 @@
         id="activitiesList" 
         class="item-display" 
         aria-labelledby="activitiesHeader"
-        data="[[activityDataProvider]]" 
+        data="[[activityCollectionDataProvider]]" 
         gridlines.item="visible" 
         selection-mode="single" 
         selected="{{selectedActivity}}"
@@ -78,13 +78,16 @@
               <div class="oj-flex no-wrap">
                 <span class="demo-thumbnail oj-flex-item"
                   :style.background-image="[[' url('+$current.data.image+')']]"></span>
-                <div class="demo-content oj-flex-item">
-                  <div>
-                    <strong>
-                      <oj-bind-text value="[[$current.data.name]]"></oj-bind-text>
-                    </strong>
+                  <div class="demo-content oj-flex-item">
+                    <div>
+                      <strong>
+                        <oj-bind-text value="[[$current.data.name]]"></oj-bind-text>
+                      </strong>
+                    </div>
+                    <span class="demo-metadata">
+                      <oj-bind-text value="[[$current.data.short_desc]]"></oj-bind-text>
+                    </span>
                   </div>
-                </div>
               </div>
             </template>
           </oj-list-view>

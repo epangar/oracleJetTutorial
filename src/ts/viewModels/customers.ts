@@ -14,6 +14,13 @@ import { ojDialog } from 'ojs/ojdialog';
 import { ojButtonEventMap } from 'ojs/ojbutton';
 import "demo-update-item/loader";
 
+//Data ejercicio
+import MutableArrayDataprovider = require("ojs/ojmutablearraydataprovider")
+import { Model, Collection } from 'ojs/ojmodel';
+import * as KnockoutUtils from "ojs/ojknockout-model";
+import MutableArrayDataProvider = require("ojs/ojmutablearraydataprovider");
+import CollectionDataProvider = require("ojs/ojcollectiondataprovider");
+import { stringToNodeArray } from "@oracle/oraclejet/dist/types/ojhtmlutils";
 
 
 type Activity = {
@@ -78,7 +85,7 @@ class CustomersViewModel {
   keyAttributes = "id";
   activityKey : number = 3;
   restServerURLActivities = "https://apex.oracle.com/pls/apex/oraclejet/lp/activities/";
-  activityDataProvider: RESTDataProvider<Activity["id"], Activity>;
+  //activityDataProvider: RESTDataProvider<Activity["id"], Activity>;
   itemsDataProvider: RESTDataProvider<Item["id"], Item>
   restServerURLItems = "https://apex.oracle.com/pls/apex/oraclejet/lp/activities/" + this.activityKey + "/items/";
 
@@ -93,32 +100,105 @@ class CustomersViewModel {
   firstSelectedItem = ko.observable();
 
 
+
+  //Dataprovider exercise
+  activitiesObservable : ko.Observable<Collection>;
+  activityCollectionDataProvider: ko.Observable<CollectionDataProvider<number, Activity>>;
+  
+  
+
+  private parseActivity = (response: {
+    id: number;
+    name: string;
+    image: string;
+    short_desc: string;
+  }) => {
+    return {
+      id: response["id"],
+      name: response["name"],
+      image:  response["image"],
+      short_desc: response["short_desc"],
+    };
+  };
+  private parseSaveActivity = (response: {
+    id: number;
+    name: string;
+    image: string;
+    short_desc: string;
+  }) => {
+    return {
+      id: response["id"],
+      name: response["name"],
+      image:  response["image"],
+      short_desc: response["short_desc"],
+    };
+  };
+
+
+  private parseItem = (response: {
+    id: number;
+    name: string;
+    price: number;
+    description: string;
+  }) => {
+
+    return {
+      id: response["id"],
+      name: response["name"],
+      price: response["price"],
+      description: response["description"],
+    };
+  };
+  private parseSaveItem = (response: {
+    id: number;
+    name: string;
+    price: number;
+    description: string;
+    quantity: number,
+    quantity_shipped: number,
+    quantity_instock: number,
+    activity_id: number,
+  }) => {
+    debugger
+    return {
+      id: response["id"],
+      name: response["name"],
+      price: response["price"],
+      description: response["description"],
+    };
+  };
+
+  Activity = Model.extend({
+      parse: this.parseActivity,
+      parseSave: this.parseSaveActivity,
+      idAttribute: "ActivityId",
+  })
+  Item = Model.extend({
+      parse: this.parseItem,
+      parseSave: this.parseSaveItem,
+      idAttribute: "ItemId",    
+  })
+
+  myActivity = new this.Activity();
+  myItem = new this.Item();
+
+  
+  private ItemCollection = Collection.extend({
+    url: this.restServerURLItems,
+    model: this.myItem,
+    comparator: 'id'
+  });
+  private ActivityCollection  = Collection.extend({
+    url: this.restServerURLActivities,
+    model: this.myActivity,
+    comparator: 'id'
+  });
+  myData : ko.Observable<any>;
+  
   
   constructor() {
-    
-    this.activityDataProvider = new RESTDataProvider({
-      keyAttributes : this.keyAttributes,
-      url: this.restServerURLActivities,
-      transforms:{
-        fetchFirst: {
-          request: async (options) => {
-            // debugger
-            const url = new URL(options.url);
-            const { size, offset } = options.fetchParameters;
-            url.searchParams.set("limit", String(size));
-            url.searchParams.set("offset", String(offset));
-            return new Request(url.href);
-          },
-          response: async ({body}) => {
-            // debugger
-            const {items, totalSize, hasMore} = body;
-            return {data: items, totalSize, hasMore}
-          }
-        }
-      }
-    })
 
-   
+    
     this.pieSeriesValue = ko.observableArray([]);
 
     let pieSeries = [
@@ -134,8 +214,36 @@ class CustomersViewModel {
     //
     this.currentItem = ko.observable({...emptyItem});
 
+    //Dataprovider exercise
 
-  
+    //hacer fetch de actividades e items para mi activity data provider
+    this.activitiesObservable = ko.observable();
+    let actCollection = new this.ActivityCollection();
+    actCollection.fetch({
+      success: () => {
+        //debugger
+        let koObjActivity = (KnockoutUtils.map(this.myActivity) as unknown as Activity[]);
+        //this.currentItem(koObjActivity);
+      },
+    })
+    this.activitiesObservable(actCollection);
+    this.activityCollectionDataProvider = ko.observable();
+    this.activityCollectionDataProvider(new CollectionDataProvider<number, Activity>(this.activitiesObservable()));
+    
+    
+
+    //debugger
+    this.myActivity.urlRoot = this.restServerURLActivities;
+    this.myItem.urlRoot = this.restServerURLItems;
+
+    // this.myActivity.fetch({
+    //   success: this.fetchItemSuccess,
+    // });
+    // this.myItem.fetch({
+    //   success: this.fetchActivitySuccess,
+    // });
+    //Obtener datos
+    // this.fetchCollection()
   }
 
   selectedActivityChanged = (event: ojListView.firstSelectedItemChanged<ActivityItems["id"], ActivityItems>) => {
@@ -143,7 +251,7 @@ class CustomersViewModel {
     *  If no items are selected then the firstSelectedItem property  returns an object 
     *  with both key and data properties set to null.
     */
-  //  debugger
+    debugger
     let itemContext = event.detail.value.data;
  
     if (itemContext != null) {    
@@ -152,6 +260,9 @@ class CustomersViewModel {
       this.activityKey = event.detail.value.data.id;
       this.restServerURLItems =  "https://apex.oracle.com/pls/apex/oraclejet/lp/activities/" + this.activityKey + "/items/";
 
+
+      //hacer el fetch de los items
+      // observable de items?
 
       this.itemsDataProvider = new RESTDataProvider({
         keyAttributes: this.keyAttributes,
@@ -187,7 +298,7 @@ class CustomersViewModel {
       this.activitySelected(false);
       this.itemSelected(false);    
     }
- };
+  };
 
   public showCreateDialog = (event: ojButtonEventMap["ojAction"])=>{
     //Observable de useCase
@@ -334,7 +445,38 @@ class CustomersViewModel {
         }
       }
     }
-   };
+  };
+
+  
+
+  // private fetchActivitySuccess = () => {
+  //   let koObjActivity: Item = (KnockoutUtils.map(this.myActivity) as unknown as Item);
+  //   //debugger
+  //   this.currentItem(koObjActivity);
+  //   this.myActivity.urlRoot = this.restServerURLActivities;
+  //   //this.myActivity.id = 10;
+
+  //   this.ActivityCollection.fetch({
+  //     success: () => {
+  //       koObjActivity = (KnockoutUtils.map(this.myActivity) as unknown as Item);
+  //       this.currentItem(koObjActivity);
+  //     },
+  //   });
+  // };
+
+  // private fetchItemSuccess = () => {
+  //   let koObjActivity: Item = (KnockoutUtils.map(this.myActivity) as unknown as Item);
+  //   //debugger
+  //   this.currentItem(koObjActivity);
+  //   this.myItem.urlRoot = this.restServerURLItems;
+  //   //this.myItem.id = 10;
+  //   this.myItem.fetch({
+  //     success: () => {
+  //       koObjActivity = (KnockoutUtils.map(this.myItem) as unknown as Item);
+  //       this.currentItem(koObjActivity);
+  //     },
+  //   });
+  // };
 
 
   /**
@@ -380,7 +522,15 @@ class CustomersViewModel {
   connected(): void {
     AccUtils.announce("Dashboard page loaded.");
     document.title = "Dashboard";
+    // debugger
     // implement further logic if needed
+    // this.ActivityCollection.fetch({
+    //   propName: this.activityKey,
+    //   success: (collection: Collection, response: any, options: object) =>{
+    //     debugger
+    //     //this.activityDataProvider(collection)
+    //   }
+    // })
   }
 
   /**

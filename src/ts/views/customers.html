@@ -65,7 +65,7 @@
           <oj-list-view 
             id="itemsList" 
             class="item-display" 
-            data="[[itemsDataProvider]]"
+            data="[[itemCollectionDataProvider]]"
             aria-labelledby="itemsListHeader" 
             gridlines.item="visible" 
             selection-mode="single"
@@ -150,7 +150,6 @@
   
           <div id="itemDetailsContainer" class="oj-flex-item oj-panel oj-bg-neutral-30 oj-md-6 oj-sm-12">
             <h3>Item Details</h3>
-
             <hr class="hr-margin" />
             <oj-avatar role="img" size="lg" :aria-label="[['product image for '+ firstSelectedItem()?.data.name]]"
               :src="[[firstSelectedItem()?.data.image]]" class="float-right">

@@ -21,6 +21,7 @@ import * as KnockoutUtils from "ojs/ojknockout-model";
 import MutableArrayDataProvider = require("ojs/ojmutablearraydataprovider");
 import CollectionDataProvider = require("ojs/ojcollectiondataprovider");
 import { stringToNodeArray } from "@oracle/oraclejet/dist/types/ojhtmlutils";
+import ViewModel from "demo-update-item/demo-update-item-viewModel";
 
 
 type Activity = {
@@ -83,18 +84,17 @@ class CustomersViewModel {
 
 
   keyAttributes = "id";
-  activityKey : number = 3;
+  activityKey : number = 1;
   restServerURLActivities = "https://apex.oracle.com/pls/apex/oraclejet/lp/activities/";
   //activityDataProvider: RESTDataProvider<Activity["id"], Activity>;
   itemsDataProvider: RESTDataProvider<Item["id"], Item>
   restServerURLItems = "https://apex.oracle.com/pls/apex/oraclejet/lp/activities/" + this.activityKey + "/items/";
 
-  itemsArray: Array<Object>;
   pieSeriesValue: ko.ObservableArray;
   selectedActivity = new ObservableKeySet();
   activitySelected = ko.observable(false);
   firstSelectedActivity = ko.observable();
-  selectedActivityIds = ko.observable();
+  //selectedActivityIds = ko.observable();
   itemSelected = ko.observable(false);
   selectedKeyItem = ko.observable();
   firstSelectedItem = ko.observable();
@@ -103,7 +103,9 @@ class CustomersViewModel {
 
   //Dataprovider exercise
   activitiesObservable : ko.Observable<Collection>;
+  itemsObservable : ko.Observable<Collection>;
   activityCollectionDataProvider: ko.Observable<CollectionDataProvider<number, Activity>>;
+  itemCollectionDataProvider: ko.Observable<CollectionDataProvider<number, Item>>;
   
   
 
@@ -137,16 +139,24 @@ class CustomersViewModel {
 
   private parseItem = (response: {
     id: number;
+    activity_id: number;
     name: string;
     price: number;
     description: string;
+    image: string;
+    quantity_shipped: number,
+    quantity_instock: number,
   }) => {
 
     return {
       id: response["id"],
+      activity_id: response["activity_id"],
       name: response["name"],
       price: response["price"],
       description: response["description"],
+      image: response["image"],
+      quantity_shipped: response["quantity_shipped"],
+      quantity_instock: response["quantity_instock"],
     };
   };
   private parseSaveItem = (response: {
@@ -158,43 +168,48 @@ class CustomersViewModel {
     quantity_shipped: number,
     quantity_instock: number,
     activity_id: number,
+    image: string;
   }) => {
-    debugger
     return {
       id: response["id"],
       name: response["name"],
       price: response["price"],
       description: response["description"],
+      image: response["image"],
+      activity_id: response["activity_id"],
+      quantity_shipped: response["quantity_shipped"],
+      quantity_instock: response["quantity_instock"],
     };
   };
 
   Activity = Model.extend({
       parse: this.parseActivity,
       parseSave: this.parseSaveActivity,
-      idAttribute: "ActivityId",
+      idAttribute: "id",
   })
   Item = Model.extend({
       parse: this.parseItem,
       parseSave: this.parseSaveItem,
-      idAttribute: "ItemId",    
+      idAttribute: "id",    
   })
 
   myActivity = new this.Activity();
   myItem = new this.Item();
 
-  
   private ItemCollection = Collection.extend({
-    url: this.restServerURLItems,
+    url: "https://apex.oracle.com/pls/apex/oraclejet/lp/activities/" + "0" + "/items/",
     model: this.myItem,
     comparator: 'id'
   });
+
+  
   private ActivityCollection  = Collection.extend({
     url: this.restServerURLActivities,
     model: this.myActivity,
     comparator: 'id'
   });
   myData : ko.Observable<any>;
-  
+  itemCollection : Collection;
   
   constructor() {
 
@@ -217,33 +232,27 @@ class CustomersViewModel {
     //Dataprovider exercise
 
     //hacer fetch de actividades e items para mi activity data provider
-    this.activitiesObservable = ko.observable();
+    this.itemsObservable = ko.observable(new Collection());
     let actCollection = new this.ActivityCollection();
     actCollection.fetch({
       success: () => {
         //debugger
-        let koObjActivity = (KnockoutUtils.map(this.myActivity) as unknown as Activity[]);
+        //let koObjActivity = (KnockoutUtils.map(this.myActivity) as unknown as Activity);
         //this.currentItem(koObjActivity);
+        this.activitiesObservable(actCollection);
       },
     })
-    this.activitiesObservable(actCollection);
-    this.activityCollectionDataProvider = ko.observable();
-    this.activityCollectionDataProvider(new CollectionDataProvider<number, Activity>(this.activitiesObservable()));
+    this.activitiesObservable = ko.observable(actCollection);
+
+    this.activityCollectionDataProvider = ko.observable(new CollectionDataProvider<number, Activity>(this.activitiesObservable()));
     
+    this.itemCollection = new this.ItemCollection();
     
+    this.itemCollectionDataProvider = ko.observable(new CollectionDataProvider<number, Item>(this.itemCollection))
 
     //debugger
     this.myActivity.urlRoot = this.restServerURLActivities;
     this.myItem.urlRoot = this.restServerURLItems;
-
-    // this.myActivity.fetch({
-    //   success: this.fetchItemSuccess,
-    // });
-    // this.myItem.fetch({
-    //   success: this.fetchActivitySuccess,
-    // });
-    //Obtener datos
-    // this.fetchCollection()
   }
 
   selectedActivityChanged = (event: ojListView.firstSelectedItemChanged<ActivityItems["id"], ActivityItems>) => {
@@ -251,42 +260,29 @@ class CustomersViewModel {
     *  If no items are selected then the firstSelectedItem property  returns an object 
     *  with both key and data properties set to null.
     */
-    debugger
-    let itemContext = event.detail.value.data;
+    let activityContext = event.detail.value.data;
  
-    if (itemContext != null) {    
+    if (activityContext != null) {    
       
       this.activitySelected(false);
       this.activityKey = event.detail.value.data.id;
-      this.restServerURLItems =  "https://apex.oracle.com/pls/apex/oraclejet/lp/activities/" + this.activityKey + "/items/";
 
+      
 
       //hacer el fetch de los items
       // observable de items?
 
-      this.itemsDataProvider = new RESTDataProvider({
-        keyAttributes: this.keyAttributes,
-        url: this.restServerURLItems,
-        transforms: {
-        fetchFirst: {
-              request: async (options) => {
-                // debugger
-              const url = new URL(options.url);
-              const { size, offset } = options.fetchParameters;
-              url.searchParams.set("limit", String(size));
-              url.searchParams.set("offset", String(offset));
-              return new Request(url.href);
-              },
-              response: async ({ body }) => {
-                // debugger
-              const { items, totalSize, hasMore } = body;
-              return { data: items, totalSize, hasMore };
-              },
-           },
-        },
-        }); 
-
-
+      //FETCH DEL MODEL ITEM
+      //let itemCollection = new ItemCollection();
+      (this.itemCollection as Collection).url = "https://apex.oracle.com/pls/apex/oraclejet/lp/activities/" + this.activityKey + "/items/"
+      this.itemCollection.fetch({
+        success: (collection: Collection)=>{
+          //this.itemsObservable(collection);
+          //this.itemCollectionDataProvider(new CollectionDataProvider<number, Item>(this.itemsObservable()));
+          
+        }
+      })
+      
 
       this.activitySelected(true);
       this.itemSelected(false);
@@ -315,39 +311,38 @@ class CustomersViewModel {
   public createItem = async(event: ojButtonEventMap["ojAction"]) => {
     debugger
     //AQUÍ debo actualizar el observable this.currentItem()
-    console.log(event)
-
+    
 
     //this.currentItem(this.selectedData())
     let a = Number(this.currentItem().quantity_instock);
     let b = Number(this.currentItem().quantity_shipped);
 
-    const request = new Request(this.restServerURLItems, {
-      headers: new Headers({
-        "Content-type": "application/json; charset=UTF-8",
-      }),
-      body: JSON.stringify(this.currentItem()),
-      method: "POST"
+    (this.itemCollection as Collection)
+
+    const itemToCreate = this.Item.extend({
+      name: this.currentItem().name,
+      short_desc: this.currentItem().short_desc,
+      price: this.currentItem().price,
+      quantity_instock: a,
+      quantity_shipped: b,
+      quantity: a+b,
+      activity_id: this.currentItem().activity_id
     })
 
-    const response = await fetch(request);
-    const addedRow = await response.json();
-
-
-    const addedRowKey = addedRow[this.keyAttributes];
-
-    const addedRomMetaData = {key: addedRowKey};
-
-    this.itemsDataProvider.mutate({
-      add: {
-        data: [addedRow],
-        keys: new Set([addedRowKey]),
-        metadata: [addedRomMetaData]
+    itemToCreate.set({
+      name: this.currentItem().name,
+      price: this.currentItem().price,
+      description: this.currentItem().short_desc
+    })
+    
+    itemToCreate.save({
+      success: ()=>{
+        debugger
       }
-    });
+    })
 
-    this.itemsDataProvider.refresh();
-
+    
+      
     //close
     let x = document.getElementById("createDialog");
     let y = (x as ojDialog);
@@ -360,7 +355,6 @@ class CustomersViewModel {
       this.useCase('update');
 
       //Observable of currentItem
-      debugger
       const item : Item = this.firstSelectedItem().data;
       this.currentItem({...item});
 
@@ -368,44 +362,55 @@ class CustomersViewModel {
   }
 
   public updateItemSubmit = async (event: ojButtonEventMap["ojAction"]) => {
-    
+    let itemID = this.firstSelectedItem()?.data.id;
     const currentRow = this.selectedRow;
     debugger
     if(currentRow != null){
       
-      const itemToUpdate : ItemToUpdate = {
-        itemId: this.currentItem().id,
+      
+      (this.itemCollection as Collection)
+      const itemToUpdate = (this.itemCollection.get(itemID) as Model);
+      console.log(itemToUpdate);
+      itemToUpdate.set({
+        id: this.currentItem().id,
         name: this.currentItem().name,
         price: this.currentItem().price,
-        short_desc: this.currentItem().short_desc
-      }
-      
-      const request = new Request(
-        `${this.restServerURLItems}${this.currentItem().id}`,
-        {
-          headers: new Headers({
-            "Content-type": "application/json; charset=UTF-8",
-          }),
-          body: JSON.stringify(itemToUpdate),
-          method: "PUT",
-        }
-      );
-
-      const response = await fetch(request)
-      const updatedRow = await response.json()
-
-
-      const updatedRowKey = this.currentItem().id;
-      const updatedRowMetaData = { key: updatedRowKey}
-      this.itemsDataProvider.mutate({
-        update: {
-          data: [updatedRow],
-          keys: new Set([updatedRowKey]),
-          metadata: [updatedRowMetaData]
-        }
+        description: this.currentItem().short_desc
       })
+      itemToUpdate.save(
+        
+        {
+          success : () =>{}
+        }
+      )
+        
+      
+      // const request = new Request(
+      //   `${this.restServerURLItems}${this.currentItem().id}`,
+      //   {
+      //     headers: new Headers({
+      //       "Content-type": "application/json; charset=UTF-8",
+      //     }),
+      //     body: JSON.stringify(itemToUpdate),
+      //     method: "PUT",
+      //   }
+      // );
 
-      this.itemsDataProvider.refresh()
+      // const response = await fetch(request)
+      // const updatedRow = await response.json()
+
+
+      // const updatedRowKey = this.currentItem().id;
+      // const updatedRowMetaData = { key: updatedRowKey}
+      // this.itemsDataProvider.mutate({
+      //   update: {
+      //     data: [updatedRow],
+      //     keys: new Set([updatedRowKey]),
+      //     metadata: [updatedRowMetaData]
+      //   }
+      // })
+
+      // this.itemsDataProvider.refresh()
     };
 
     (document.getElementById("editDialog") as  ojDialog).close()
@@ -417,76 +422,30 @@ class CustomersViewModel {
    
     const currentRow = this.selectedRow;
     if (currentRow != null) {
+      debugger
       let really = confirm("Are you sure you want to delete this item?");
       if (really) {
+        (this.itemCollection as Collection)
+        const itemToDelete = (this.itemCollection.get(itemID) as Model);
         
-        const request = new Request(
-          `${this.restServerURLItems}${itemID}`,
-          { method: "DELETE" }
-        );
-        const response = await fetch(request);
+        this.itemCollection.remove(itemToDelete)
+        itemToDelete.destroy()
+
         
-        if (response.status === 200) {
-          const removedRowKey = itemID;
-          const removedRowMetaData = { key: removedRowKey };
-   
-          this.itemsDataProvider.mutate({
-            remove: {
-              data: [itemID],
-              keys: new Set([removedRowKey]),
-              metadata: [removedRowMetaData],
-            },
-          });
-          this.itemsDataProvider.refresh();
-   
-        }
-        else {
-          alert("Delete failed with status " + response.status + " : " + response.statusText)
-        }
+        
       }
     }
   };
-
-  
-
-  // private fetchActivitySuccess = () => {
-  //   let koObjActivity: Item = (KnockoutUtils.map(this.myActivity) as unknown as Item);
-  //   //debugger
-  //   this.currentItem(koObjActivity);
-  //   this.myActivity.urlRoot = this.restServerURLActivities;
-  //   //this.myActivity.id = 10;
-
-  //   this.ActivityCollection.fetch({
-  //     success: () => {
-  //       koObjActivity = (KnockoutUtils.map(this.myActivity) as unknown as Item);
-  //       this.currentItem(koObjActivity);
-  //     },
-  //   });
-  // };
-
-  // private fetchItemSuccess = () => {
-  //   let koObjActivity: Item = (KnockoutUtils.map(this.myActivity) as unknown as Item);
-  //   //debugger
-  //   this.currentItem(koObjActivity);
-  //   this.myItem.urlRoot = this.restServerURLItems;
-  //   //this.myItem.id = 10;
-  //   this.myItem.fetch({
-  //     success: () => {
-  //       koObjActivity = (KnockoutUtils.map(this.myItem) as unknown as Item);
-  //       this.currentItem(koObjActivity);
-  //     },
-  //   });
-  // };
-
 
   /**
   * Handle selection from Activity Items list
   */
   selectedItemChanged = (event: ojListView.firstSelectedItemChanged<Item["id"], Item>) => {
+    // debugger
     let isClicked = event.detail.value.data;
 
     if (isClicked != null) {
-      debugger
+      // debugger
       // If selection, populate and display list
       
       // Create variable and get attributes of the items list to set pie chart values
@@ -522,15 +481,7 @@ class CustomersViewModel {
   connected(): void {
     AccUtils.announce("Dashboard page loaded.");
     document.title = "Dashboard";
-    // debugger
-    // implement further logic if needed
-    // this.ActivityCollection.fetch({
-    //   propName: this.activityKey,
-    //   success: (collection: Collection, response: any, options: object) =>{
-    //     debugger
-    //     //this.activityDataProvider(collection)
-    //   }
-    // })
+    
   }
 
   /**

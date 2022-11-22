@@ -65,7 +65,6 @@ export default class ViewModel implements Composite.ViewModel<MyProperties> {
         this.messageText = ko.observable("Hello from demo-update-item");
         this.properties = context.properties;
         //const item = {...};
-        debugger
         this.myObservable = ko.observable<Item>(this.properties.item);
         this.res = componentStrings["demo-update-item"];
 
@@ -105,7 +104,7 @@ export default class ViewModel implements Composite.ViewModel<MyProperties> {
         //Cuando cambia una propiedad. context.property = qué cambia, context.value = a qué
     
         if (context.property === "item") {
-          debugger;          
+          // debugger;          
           this.myObservable(context.value as Item);
         } else if (context.property === "useCase") {
           

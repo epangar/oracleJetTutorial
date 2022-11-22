@@ -317,29 +317,39 @@ class CustomersViewModel {
     let a = Number(this.currentItem().quantity_instock);
     let b = Number(this.currentItem().quantity_shipped);
 
-    (this.itemCollection as Collection)
+    //Con esto cogemos el model que está usando nuestra collection y clona la "plantilla"
+    const itemModel = (this.itemCollection as Collection).model.clone();
 
-    const itemToCreate = this.Item.extend({
+    //Alternativa: coger la colección y hacer un create
+    // (this.itemCollection as Collection).create({
+      // name: this.currentItem().name,
+      // short_desc: this.currentItem().short_desc,
+      // price: this.currentItem().price,
+      // quantity_instock: a,
+      // quantity_shipped: b,
+      // quantity: a+b,
+      // activity_id: this.currentItem().activity_id
+    // })
+
+    //const itemToCreate = this.Item.extend()
+
+    itemModel.save({
+      id: undefined,
       name: this.currentItem().name,
-      short_desc: this.currentItem().short_desc,
       price: this.currentItem().price,
+      description: this.currentItem().short_desc,
       quantity_instock: a,
       quantity_shipped: b,
       quantity: a+b,
       activity_id: this.currentItem().activity_id
-    })
-
-    itemToCreate.set({
-      name: this.currentItem().name,
-      price: this.currentItem().price,
-      description: this.currentItem().short_desc
-    })
-    
-    itemToCreate.save({
+    }, {
       success: ()=>{
         debugger
+        this.itemCollection.refresh();
       }
     })
+    
+    
 
     
       
@@ -367,8 +377,6 @@ class CustomersViewModel {
     debugger
     if(currentRow != null){
       
-      
-      (this.itemCollection as Collection)
       const itemToUpdate = (this.itemCollection.get(itemID) as Model);
       console.log(itemToUpdate);
       itemToUpdate.set({
@@ -376,13 +384,10 @@ class CustomersViewModel {
         name: this.currentItem().name,
         price: this.currentItem().price,
         description: this.currentItem().short_desc
+      }, {
+        success : () =>{}
       })
-      itemToUpdate.save(
-        
-        {
-          success : () =>{}
-        }
-      )
+      
         
       
       // const request = new Request(
@@ -425,13 +430,15 @@ class CustomersViewModel {
       debugger
       let really = confirm("Are you sure you want to delete this item?");
       if (really) {
-        (this.itemCollection as Collection)
-        const itemToDelete = (this.itemCollection.get(itemID) as Model);
         
-        this.itemCollection.remove(itemToDelete)
-        itemToDelete.destroy()
-
-        
+        const itemToDelete = (this.itemCollection.get(itemID) as Model).clone();
+        //itemToDelete.url((this.itemCollection.url as string).concat("/").concat(itemID));
+        itemToDelete.destroy({
+          success : () =>{
+            this.itemCollection.remove(itemToDelete)
+            this.itemCollection.refresh()
+          }
+        })
         
       }
     }

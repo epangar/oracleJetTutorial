@@ -12,6 +12,8 @@ import "ojs/ojinputtext";
 import "ojs/ojlabelvalue";
 import { IntlNumberConverter } from "ojs/ojconverter-number";
 import AsyncLengthValidator = require("ojs/ojasyncvalidator-length");
+import * as KnockoutUtils from "ojs/ojknockout-model";
+
 
 
 type Item = {
@@ -50,6 +52,10 @@ export default class ViewModel implements Composite.ViewModel<MyProperties> {
     myObservable : ko.Observable<Item>;
     id: ko.Observable<string>;
 
+    //fix observable.name
+
+    myFix: any;
+
     constructor(context: Composite.ViewModelContext<MyProperties>) {        
         //At the start of your viewModel constructor
         const elementContext: Context = Context.getContext(context.element);
@@ -66,6 +72,11 @@ export default class ViewModel implements Composite.ViewModel<MyProperties> {
         this.properties = context.properties;
         //const item = {...};
         this.myObservable = ko.observable<Item>(this.properties.item);
+
+        if(this.myObservable()){
+          //this.myFix = KnockoutUtils.map({...this.myObservable})
+        }
+        
         this.res = componentStrings["demo-update-item"];
 
         this.currency = new IntlNumberConverter({

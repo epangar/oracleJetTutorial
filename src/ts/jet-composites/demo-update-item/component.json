@@ -11,6 +11,10 @@
       "type": "string",
       "writeback": true
    },
+   "isOpeningDialog": {
+      "type": "boolean",
+      "writeback": true
+   },
    "item":{
       "type": "Item",
       "writeback": true

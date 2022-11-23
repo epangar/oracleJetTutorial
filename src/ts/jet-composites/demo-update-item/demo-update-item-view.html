@@ -31,6 +31,13 @@
         value="[[$properties.useCase]]"></oj-bind-text>
     </div>
   </oj-label-value>
+  <oj-label-value>
+    <oj-label slot="label">Is Dialog Opening?</oj-label>
+    <div slot="value">
+      <oj-bind-text 
+        value="[[$properties.isOpeningDialog]]"></oj-bind-text>
+    </div>
+  </oj-label-value>
 
   <oj-bind-if test="[[myObservable()]]"> 
     

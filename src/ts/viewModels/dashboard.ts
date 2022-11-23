@@ -66,6 +66,7 @@ class DashboardViewModel {
 
   //field for update
   useCase: ko.Observable<string>; //Create, update...
+  isOpeningDialog: ko.Observable<boolean>;
 
   //  Fields for delete button and update dialog, among others
   selectedRow = ko.observable<number>();
@@ -130,6 +131,7 @@ class DashboardViewModel {
     this.quantity = 0;
     //
     this.useCase = ko.observable('');
+    this.isOpeningDialog = ko.observable(false);
 
     //
     this.currentItem = ko.observable({...emptyItem});
@@ -192,6 +194,7 @@ class DashboardViewModel {
   public showCreateDialog = (event: ojButtonEventMap["ojAction"])=>{
     //Observable de useCase
     this.useCase('create');
+    this.isOpeningDialog(true);
 
     //Inicializar observable de currentItem
     this.currentItem({...emptyItem, activity_id : this.firstSelectedActivity().data.id});
@@ -204,9 +207,7 @@ class DashboardViewModel {
   public createItem = async(event: ojButtonEventMap["ojAction"]) => {
     //debugger
     //AQUÍ debo actualizar el observable this.currentItem()
-    console.log(event)
-
-
+    
     //this.currentItem(this.selectedData())
     let a = Number(this.currentItem().quantity_instock);
     let b = Number(this.currentItem().quantity_shipped);
@@ -241,12 +242,14 @@ class DashboardViewModel {
     let x = document.getElementById("createDialog");
     let y = (x as ojDialog);
     y.close();
+    this.isOpeningDialog(false);
   }
 
   public showEditDialog = (event: ojButtonEventMap["ojAction"]) => {
       
       //Observable de useCase
       this.useCase('update');
+      this.isOpeningDialog(true);
 
       //Observable of currentItem
       //debugger
@@ -299,7 +302,7 @@ class DashboardViewModel {
 
       this.itemsDataProvider.refresh()
     };
-
+    this.isOpeningDialog(false);
     (document.getElementById("editDialog") as  ojDialog).close()
   }
   

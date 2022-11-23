@@ -48,7 +48,6 @@ export default class ViewModel implements Composite.ViewModel<MyProperties> {
     currency: IntlNumberConverter;
     lengthValue1: ko.Observable<string>;
     validators: ko.ObservableArray<AsyncLengthValidator<string>>;
-    isUpdate : boolean;
     myObservable : ko.Observable<Item>;
     id: ko.Observable<string>;
 
@@ -73,10 +72,6 @@ export default class ViewModel implements Composite.ViewModel<MyProperties> {
         //const item = {...};
         this.myObservable = ko.observable<Item>(this.properties.item);
 
-        if(this.myObservable()){
-          //this.myFix = KnockoutUtils.map({...this.myObservable})
-        }
-        
         this.res = componentStrings["demo-update-item"];
 
         this.currency = new IntlNumberConverter({
@@ -104,19 +99,25 @@ export default class ViewModel implements Composite.ViewModel<MyProperties> {
     };
 
     connected(context: Composite.ViewModelContext<MyProperties>): void {
-        
+      if(this.myObservable()){
+        debugger
+      
+        //this.myFix = KnockoutUtils.map({...this.myObservable})
+      }
     };
 
     bindingsApplied(context: Composite.ViewModelContext<MyProperties>): void {
-        
+      
     };
 
     propertyChanged = (context: Composite.PropertyChangedContext<MyProperties>): void => {
         //Cuando cambia una propiedad. context.property = qué cambia, context.value = a qué
-    
+        
         if (context.property === "item") {
-          // debugger;          
           this.myObservable(context.value as Item);
+          
+          debugger;          
+          
         } else if (context.property === "useCase") {
           
         }
